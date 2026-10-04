@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{% block title %}{{ STORE_NAME }}{% endblock %}</title>
   <meta name="description" content="{{ STORE_TAGLINE }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,7 @@
     href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap"
     rel="stylesheet"
   >
-  <link rel="stylesheet" href="{% static 'css/store.css' %}?v=5">
+  <link rel="stylesheet" href="{% static 'css/store.css' %}?v=6">
   {% render_block "css" %}
   {% block extra_head %}{% endblock %}
 </head>
@@ -20,16 +20,22 @@
   {% cms_toolbar %}
   <header class="site-header">
     <a class="brand" href="{% url 'store-home' %}">Electro<span>Market</span></a>
-    <button
-      class="nav-toggle"
-      type="button"
-      aria-label="Open menu"
-      aria-expanded="false"
-      aria-controls="site-nav"
-      data-nav-toggle
-    >
-      <span></span><span></span><span></span>
-    </button>
+    <div class="header-tools">
+      <a class="header-cart" href="{% url 'store-cart' %}" aria-label="Cart">
+        Cart
+        <span class="nav-badge{% if not cart_count %} is-empty{% endif %}" data-cart-count {% if not cart_count %}hidden{% endif %}>{{ cart_count }}</span>
+      </a>
+      <button
+        class="nav-toggle"
+        type="button"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="site-nav"
+        data-nav-toggle
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </div>
     <nav class="site-nav" id="site-nav" data-site-nav>
       <a href="{% url 'store-product-list' %}" class="{% if request.resolver_match.url_name == 'store-product-list' %}is-active{% endif %}">Catalog</a>
       {% for category in header_categories %}
@@ -48,7 +54,7 @@
         <a href="/accounts/login/?next={% url 'account-home' %}">Login</a>
         <a href="/accounts/signup/">Sign up</a>
       {% endif %}
-      <a class="nav-icon-link {% if request.resolver_match.url_name == 'store-cart' %}is-active{% endif %}" href="{% url 'store-cart' %}">
+      <a class="nav-icon-link site-nav__cart-link {% if request.resolver_match.url_name == 'store-cart' %}is-active{% endif %}" href="{% url 'store-cart' %}">
         Cart
         <span class="nav-badge{% if not cart_count %} is-empty{% endif %}" data-cart-count {% if not cart_count %}hidden{% endif %}>{{ cart_count }}</span>
       </a>
@@ -73,7 +79,7 @@
     <p class="muted">Secure checkout · Real product specs · Fast delivery</p>
   </footer>
   <div class="toast" data-toast hidden></div>
-  <script src="{% static 'js/store.js' %}?v=5" defer></script>
+  <script src="{% static 'js/store.js' %}?v=6" defer></script>
   {% render_block "js" %}
   {% block extra_body %}{% endblock %}
   {% block extra_js %}{% endblock %}

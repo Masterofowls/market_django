@@ -18,12 +18,12 @@
   };
 
   const setBadge = (selector, count) => {
-    const badge = document.querySelector(selector);
-    if (!badge) return;
     const value = Number(count) || 0;
-    badge.textContent = String(value);
-    badge.hidden = value <= 0;
-    badge.classList.toggle("is-empty", value <= 0);
+    document.querySelectorAll(selector).forEach((badge) => {
+      badge.textContent = String(value);
+      badge.hidden = value <= 0;
+      badge.classList.toggle("is-empty", value <= 0);
+    });
   };
 
   const copyText = async (value) => {

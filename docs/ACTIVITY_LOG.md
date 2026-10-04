@@ -24,3 +24,4 @@
 - Deployed cart/account hub to Fly (`electromarket.fly.dev`).
 - Forced Django superuser `admin` / `admin@gmail.com` on Supabase (shared with Fly).
 - Admin-managed header categories via `Category.show_in_header` + `header_order`.
+- Fixed mobile layout: header overflow, sticky cart chip, brand chips, 2-col product grid.
