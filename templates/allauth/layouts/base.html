@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}
+  {% block head_title %}Account{% endblock head_title %} — {{ STORE_NAME }}
+{% endblock %}
+
+{% block body %}
+<section class="auth-page">
+  <div class="wrap">
+    <div class="auth-card">
+      {% if messages %}
+        <ul class="auth-messages">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {% block content %}{% endblock content %}
+    </div>
+  </div>
+</section>
+{% endblock body %}

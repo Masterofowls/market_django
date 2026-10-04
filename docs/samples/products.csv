@@ -1,0 +1,2 @@
+sku,name,slug,short_description,description,category,tags,price,discount_percent,stock,is_active,is_featured
+SKU-DEMO-001,Demo Headphones,demo-headphones,Wireless demo SKU,Full description goes here later,audio,wireless|bluetooth,199.99,10,0,1,0

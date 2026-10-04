@@ -1,0 +1,81 @@
+{% load static sekizai_tags cms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ STORE_NAME }}{% endblock %}</title>
+  <meta name="description" content="{{ STORE_TAGLINE }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="{% static 'css/store.css' %}?v=5">
+  {% render_block "css" %}
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  {% cms_toolbar %}
+  <header class="site-header">
+    <a class="brand" href="{% url 'store-home' %}">Electro<span>Market</span></a>
+    <button
+      class="nav-toggle"
+      type="button"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="site-nav"
+      data-nav-toggle
+    >
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="site-nav" id="site-nav" data-site-nav>
+      <a href="{% url 'store-product-list' %}" class="{% if request.resolver_match.url_name == 'store-product-list' %}is-active{% endif %}">Catalog</a>
+      {% for category in header_categories %}
+        <a
+          href="{% url 'store-category-detail' category.slug %}"
+          class="{% if request.resolver_match.url_name == 'store-category-detail' and request.resolver_match.kwargs.slug == category.slug %}is-active{% endif %}"
+        >{{ category.name }}</a>
+      {% endfor %}
+      {% if user.is_authenticated %}
+        <a href="{% url 'account-favourites' %}" class="nav-icon-link {% if request.resolver_match.url_name == 'account-favourites' %}is-active{% endif %}">
+          Favourites
+          {% if favourite_count %}<span class="nav-badge" data-favourite-count>{{ favourite_count }}</span>{% else %}<span class="nav-badge is-empty" data-favourite-count hidden>0</span>{% endif %}
+        </a>
+        <a href="{% url 'account-home' %}" class="{% if request.resolver_match.url_name == 'account-home' %}is-active{% endif %}">Account</a>
+      {% else %}
+        <a href="/accounts/login/?next={% url 'account-home' %}">Login</a>
+        <a href="/accounts/signup/">Sign up</a>
+      {% endif %}
+      <a class="nav-icon-link {% if request.resolver_match.url_name == 'store-cart' %}is-active{% endif %}" href="{% url 'store-cart' %}">
+        Cart
+        <span class="nav-badge{% if not cart_count %} is-empty{% endif %}" data-cart-count {% if not cart_count %}hidden{% endif %}>{{ cart_count }}</span>
+      </a>
+      <a class="btn site-nav__cta" href="{% url 'store-product-list' %}?category=smartphones">Shop phones</a>
+    </nav>
+  </header>
+  <div class="nav-backdrop" data-nav-backdrop hidden></div>
+  <main class="site-main">
+    {% if messages %}
+      <div class="wrap flash-stack">
+        {% for message in messages %}
+          <p class="flash flash--{{ message.tags|default:'info' }}">{{ message }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block body %}
+      {% block content %}{% endblock %}
+    {% endblock %}
+  </main>
+  <footer class="site-footer">
+    <p><strong>{{ STORE_NAME }}</strong> — curated smartphones from Samsung, Nothing, and Apple.</p>
+    <p class="muted">Secure checkout · Real product specs · Fast delivery</p>
+  </footer>
+  <div class="toast" data-toast hidden></div>
+  <script src="{% static 'js/store.js' %}?v=5" defer></script>
+  {% render_block "js" %}
+  {% block extra_body %}{% endblock %}
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

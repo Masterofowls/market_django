@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Catalog — {{ STORE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="wrap page-hero">
+  <h1>Smartphone catalog</h1>
+  <p class="muted">Filter by name, public ID, brand category, or tag.</p>
+  <form method="get" class="filters">
+    <input
+      type="search"
+      name="q"
+      value="{{ request.GET.q }}"
+      placeholder="Search by name or public ID"
+    >
+    <select name="category">
+      <option value="">All categories</option>
+      {% for category in filter_categories %}
+        <option value="{{ category.slug }}" {% if request.GET.category == category.slug %}selected{% endif %}>
+          {{ category.name }}
+        </option>
+      {% endfor %}
+    </select>
+    <input type="text" name="tag" value="{{ request.GET.tag }}" placeholder="Tag (e.g. flagship)">
+    <button class="btn" type="submit">Apply filters</button>
+  </form>
+</div>
+
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    {% if products %}
+      <div class="product-grid">
+        {% for product in products %}
+          {% include "store/partials/product_card.html" %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">No phones match these filters.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

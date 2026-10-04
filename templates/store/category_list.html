@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Categories — {{ STORE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="wrap page-hero">
+  <h1>Categories</h1>
+  <p class="muted">Browse the smartphone tree by brand.</p>
+</div>
+<section class="section" style="padding-top:0">
+  <div class="wrap brand-rail">
+    {% for category in categories %}
+      <a class="brand-tile" href="{% url 'store-category-detail' category.slug %}">{{ category.name }}</a>
+    {% empty %}
+      <p class="muted">No categories yet.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

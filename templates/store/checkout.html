@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout — {{ STORE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="wrap account-page">
+  <div class="section__head">
+    <div>
+      <h1>Checkout</h1>
+      <p class="muted">{{ cart.item_count }} item{{ cart.item_count|pluralize }} · {{ cart.subtotal }} €</p>
+    </div>
+    <a class="btn btn--ghost" href="{% url 'store-cart' %}">Back to cart</a>
+  </div>
+
+  <div class="checkout-grid">
+    <form class="panel-form" method="post">
+      {% csrf_token %}
+      <label>
+        Email
+        <input type="email" name="email" required value="{% if user.is_authenticated %}{{ user.email }}{% endif %}">
+      </label>
+      <label>
+        Shipping address
+        <textarea name="shipping_address" rows="4" placeholder="Street, city, postal code, country"></textarea>
+      </label>
+      <label>
+        Order notes
+        <textarea name="notes" rows="3" placeholder="Optional delivery notes"></textarea>
+      </label>
+      <button class="btn" type="submit">Place order · {{ cart.subtotal }} €</button>
+    </form>
+
+    <aside class="cart-summary">
+      <h2>Order summary</h2>
+      <ul class="plain-list">
+        {% for item in items %}
+          <li>{{ item.quantity }} × {{ item.product.name }} <span>{{ item.line_total }} €</span></li>
+        {% endfor %}
+      </ul>
+      <p>Total <strong>{{ cart.subtotal }} €</strong></p>
+    </aside>
+  </div>
+</div>
+{% endblock %}

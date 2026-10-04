@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}{{ STORE_NAME }} — Smartphones{% endblock %}
+
+{% block content %}
+<section class="hero-bleed">
+  <div class="hero-bleed__media" aria-hidden="true">
+    {% if hero_image %}
+      <img src="{{ hero_image }}" alt="">
+    {% endif %}
+  </div>
+  <div class="hero-bleed__content">
+    <h1 class="hero-bleed__brand">Electro<span>Market</span></h1>
+    <p class="hero-bleed__lead">
+      Flagship smartphones from Samsung, Nothing, and Apple — compared side by side with real specs.
+    </p>
+    <div class="hero-bleed__actions">
+      <a class="btn" href="{% url 'store-product-list' %}?category=smartphones">Browse smartphones</a>
+      <a class="btn btn--ghost" href="{% url 'store-category-detail' 'apple' %}">Shop Apple</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section__head">
+      <div>
+        <h2>Shop by brand</h2>
+        <p class="muted">Three manufacturers. One polished catalog.</p>
+      </div>
+    </div>
+    <div class="brand-rail">
+      {% for brand in brands %}
+        <a class="brand-tile" href="{% url 'store-category-detail' brand.slug %}">{{ brand.name }}</a>
+      {% empty %}
+        <a class="brand-tile" href="{% url 'store-product-list' %}">Smartphones</a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="section__head">
+      <div>
+        <h2>Featured phones</h2>
+        <p class="muted">Editor picks with current pricing and discounts.</p>
+      </div>
+      <a href="{% url 'store-product-list' %}">View all →</a>
+    </div>
+    <div class="product-grid">
+      {% for product in featured %}
+        {% include "store/partials/product_card.html" %}
+      {% empty %}
+        <p class="muted">Catalog is still loading. Run the seed command to import phones.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

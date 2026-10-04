@@ -1,0 +1,2 @@
+number,user_email,email,status,subtotal,discount_total,shipping_total,grand_total,shipping_address,notes
+ORD-DEMO0001,buyer@example.com,buyer@example.com,pending,199.99,20.00,0.00,179.99,123 Demo Street,Imported sample

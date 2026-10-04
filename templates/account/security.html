@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Security — {{ STORE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="wrap account-page">
+  <div class="section__head">
+    <div>
+      <h1>Security</h1>
+      <p class="muted">Password, passkeys, and two-factor authentication.</p>
+    </div>
+  </div>
+  {% include "account/_nav.html" %}
+
+  <div class="security-grid">
+    <section class="security-card">
+      <h2>Password</h2>
+      <p class="muted">Change your password for password-based sign-in.</p>
+      <a class="btn btn--ghost" href="{% url 'account_change_password' %}">Change password</a>
+    </section>
+
+    <section class="security-card">
+      <h2>Passkeys &amp; 2FA</h2>
+      <p class="muted">
+        Register a passkey (Face ID, Touch ID, Windows Hello) or authenticator app.
+        {% if has_webauthn %}Passkey ready.{% else %}No passkey yet.{% endif %}
+        {% if has_totp %} Authenticator app linked.{% endif %}
+      </p>
+      <a class="btn" href="{% url 'mfa_index' %}">Manage passkeys &amp; 2FA</a>
+    </section>
+
+    <section class="security-card">
+      <h2>Email</h2>
+      <p class="muted">Keep a verified email for recovery and order receipts.</p>
+      <a class="btn btn--ghost" href="{% url 'account_email' %}">Manage email</a>
+    </section>
+  </div>
+
+  {% if authenticators %}
+    <section class="account-section">
+      <h2>Active authenticators</h2>
+      <ul class="plain-list">
+        {% for auth in authenticators %}
+          <li>
+            <strong>{{ auth.get_type_display }}</strong>
+            <span class="muted">added {{ auth.created_at|date:"M j, Y" }}{% if auth.last_used_at %} · last used {{ auth.last_used_at|date:"M j, Y" }}{% endif %}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+</div>
+{% endblock %}

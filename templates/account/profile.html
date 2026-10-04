@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Profile — {{ STORE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="wrap account-page">
+  <div class="section__head">
+    <div>
+      <h1>Profile</h1>
+      <p class="muted">Your contact details for orders and account recovery.</p>
+    </div>
+  </div>
+  {% include "account/_nav.html" %}
+
+  <form class="panel-form" method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      <label>
+        {{ field.label }}
+        {{ field }}
+        {% if field.errors %}<span class="field-error">{{ field.errors|striptags }}</span>{% endif %}
+      </label>
+    {% endfor %}
+    <p class="muted">Username: <strong>{{ user.username }}</strong></p>
+    <button class="btn" type="submit">Save profile</button>
+  </form>
+</div>
+{% endblock %}

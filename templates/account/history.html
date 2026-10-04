@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Viewed items — {{ STORE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="wrap account-page">
+  <div class="section__head">
+    <div>
+      <h1>Recently viewed</h1>
+      <p class="muted">Your browsing history on ElectroMarket.</p>
+    </div>
+  </div>
+  {% include "account/_nav.html" %}
+
+  {% if history %}
+    <div class="product-grid">
+      {% for product in history %}
+        {% include "store/partials/product_card.html" %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-panel">
+      <h2>No viewed items yet</h2>
+      <a class="btn" href="{% url 'store-product-list' %}">Start browsing</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

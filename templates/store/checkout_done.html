@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Order placed — {{ STORE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="wrap account-page">
+  <div class="empty-panel">
+    <h1>Thank you</h1>
+    <p>Order <strong>{{ order.number }}</strong> is confirmed for {{ order.email }}.</p>
+    <p class="muted">Total {{ order.grand_total }} €</p>
+    <a class="btn" href="{% url 'store-product-list' %}">Continue shopping</a>
+  </div>
+</div>
+{% endblock %}

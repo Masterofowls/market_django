@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Account — {{ STORE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="wrap account-page">
+  <div class="section__head">
+    <div>
+      <h1>Hello{% if user.first_name %}, {{ user.first_name }}{% endif %}</h1>
+      <p class="muted">Manage profile, security, orders, and saved phones.</p>
+    </div>
+  </div>
+  {% include "account/_nav.html" %}
+
+  <div class="account-stats">
+    <a class="stat-tile" href="{% url 'account-orders' %}">
+      <strong>{{ order_count }}</strong>
+      <span>Orders</span>
+    </a>
+    <a class="stat-tile" href="{% url 'account-favourites' %}">
+      <strong>{{ favourite_count }}</strong>
+      <span>Favourites</span>
+    </a>
+    <a class="stat-tile" href="{% url 'account-history' %}">
+      <strong>{{ history|length }}</strong>
+      <span>Recently viewed</span>
+    </a>
+    <a class="stat-tile" href="{% url 'account-security' %}">
+      <strong>{{ passkey_count }}</strong>
+      <span>Passkeys</span>
+    </a>
+  </div>
+
+  <section class="account-section">
+    <div class="section__head">
+      <h2>Recent orders</h2>
+      <a href="{% url 'account-orders' %}">All orders →</a>
+    </div>
+    {% if orders %}
+      <ul class="plain-list order-list">
+        {% for order in orders %}
+          <li>
+            <a href="{% url 'account-order-detail' order.number %}">
+              <strong>{{ order.number }}</strong>
+              <span>{{ order.status }} · {{ order.grand_total }} €</span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">No orders yet.</p>
+    {% endif %}
+  </section>
+
+  <section class="account-section">
+    <div class="section__head">
+      <h2>Favourites</h2>
+      <a href="{% url 'account-favourites' %}">Wishlist →</a>
+    </div>
+    {% if favourites %}
+      <div class="product-grid">
+        {% for fav in favourites %}
+          {% with product=fav.product %}
+            {% include "store/partials/product_card.html" %}
+          {% endwith %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">Save phones you love for later.</p>
+    {% endif %}
+  </section>
+
+  <section class="account-section">
+    <div class="section__head">
+      <h2>Recently viewed</h2>
+      <a href="{% url 'account-history' %}">Full history →</a>
+    </div>
+    {% if history %}
+      <div class="product-grid">
+        {% for product in history %}
+          {% include "store/partials/product_card.html" %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">Browse the catalog to build your viewing history.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

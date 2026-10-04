@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Cart — {{ STORE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="wrap account-page">
+  <div class="section__head">
+    <div>
+      <h1>Shopping cart</h1>
+      <p class="muted">{{ cart.item_count }} item{{ cart.item_count|pluralize }}</p>
+    </div>
+    {% if items %}
+      <a class="btn" href="{% url 'store-checkout' %}">Checkout</a>
+    {% endif %}
+  </div>
+
+  {% if items %}
+    <div class="cart-list">
+      {% for item in items %}
+        <article class="cart-row">
+          {% with image=item.product.images.all.0 %}
+            <a class="cart-row__media" href="{% url 'store-product-detail' item.product.slug %}">
+              {% if image %}
+                <img src="{{ image.card_thumb.url }}" alt="{{ item.product.name }}">
+              {% endif %}
+            </a>
+          {% endwith %}
+          <div class="cart-row__body">
+            <a href="{% url 'store-product-detail' item.product.slug %}">
+              <p class="product-card__brand">{{ item.product.category.name }}</p>
+              <h2>{{ item.product.name }}</h2>
+            </a>
+            <p class="muted">{{ item.unit_price }} € each</p>
+            <div class="cart-row__controls">
+              <form method="post" action="{% url 'store-cart-update' item.product_id %}">
+                {% csrf_token %}
+                <label>
+                  Qty
+                  <input type="number" name="quantity" min="1" max="99" value="{{ item.quantity }}">
+                </label>
+                <button class="btn btn--ghost btn--small" type="submit">Update</button>
+              </form>
+              <form method="post" action="{% url 'store-cart-remove' item.product_id %}">
+                {% csrf_token %}
+                <button class="btn btn--ghost btn--small" type="submit">Remove</button>
+              </form>
+            </div>
+          </div>
+          <div class="cart-row__total">
+            <strong>{{ item.line_total }} €</strong>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+    <div class="cart-summary">
+      <p>Subtotal <strong>{{ cart.subtotal }} €</strong></p>
+      <a class="btn" href="{% url 'store-checkout' %}">Proceed to checkout</a>
+    </div>
+  {% else %}
+    <div class="empty-panel">
+      <h2>Your cart is empty</h2>
+      <p class="muted">Browse flagship phones and add the ones you like.</p>
+      <a class="btn" href="{% url 'store-product-list' %}">Browse catalog</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

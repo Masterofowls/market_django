@@ -1,0 +1,9 @@
+<nav class="account-nav" aria-label="Account">
+  <a href="{% url 'account-home' %}" class="{% if request.resolver_match.url_name == 'account-home' %}is-active{% endif %}">Overview</a>
+  <a href="{% url 'account-profile' %}" class="{% if request.resolver_match.url_name == 'account-profile' %}is-active{% endif %}">Profile</a>
+  <a href="{% url 'account-security' %}" class="{% if request.resolver_match.url_name == 'account-security' %}is-active{% endif %}">Security</a>
+  <a href="{% url 'account-orders' %}" class="{% if 'order' in request.resolver_match.url_name %}is-active{% endif %}">Orders</a>
+  <a href="{% url 'account-favourites' %}" class="{% if request.resolver_match.url_name == 'account-favourites' %}is-active{% endif %}">Favourites</a>
+  <a href="{% url 'account-history' %}" class="{% if request.resolver_match.url_name == 'account-history' %}is-active{% endif %}">Viewed</a>
+  <a href="/accounts/logout/">Sign out</a>
+</nav>

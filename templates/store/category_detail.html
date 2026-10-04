@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} — {{ STORE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="wrap page-hero">
+  <h1>{{ category.name }}</h1>
+  <p class="muted">{{ category.description }}</p>
+</div>
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="product-grid">
+      {% for product in products %}
+        {% include "store/partials/product_card.html" %}
+      {% empty %}
+        <p class="muted">No products in this category yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

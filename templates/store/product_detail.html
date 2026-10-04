@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} — {{ STORE_NAME }}{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="wrap product-page">
+  <article class="product-detail">
+    <div class="product-detail__gallery">
+      {% with image=product.images.all.0 %}
+        {% if image %}
+          <img src="{{ image.preview.url }}" alt="{{ image.alt_text|default:product.name }}">
+        {% endif %}
+      {% endwith %}
+    </div>
+    <div class="product-detail__info">
+      <p class="product-card__brand">{{ product.category.name }}</p>
+      <h1>{{ product.name }}</h1>
+      <div class="product-detail__meta-row">
+        <span>ID {{ public_id }}</span>
+        <span>SKU {{ product.sku }}</span>
+        <span>★ {{ product.average_rating }} ({{ product.rating_count }} reviews)</span>
+      </div>
+      <div class="product-detail__price">
+        {% if product.discount_percent %}
+          <s>{{ product.price }} €</s>
+          <strong>{{ product.final_price }} €</strong>
+          <span class="badge">-{{ product.discount_percent|floatformat:0 }}%</span>
+        {% else %}
+          <strong>{{ product.final_price }} €</strong>
+        {% endif %}
+      </div>
+      <p>{{ product.short_description }}</p>
+      <p class="muted">In stock: {{ product.stock }} · Shared {{ product.share_count }} times</p>
+
+      <div class="product-detail__actions">
+        <form method="post" action="{% url 'store-cart-add' product.id %}" data-cart-add>
+          {% csrf_token %}
+          <input type="hidden" name="quantity" value="1">
+          <input type="hidden" name="next" value="{% url 'store-cart' %}">
+          <button class="btn" type="submit">Add to cart</button>
+        </form>
+        {% if user.is_authenticated %}
+          <form method="post" action="{% url 'store-favourite-toggle' product.id %}" data-favourite-toggle>
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button
+              class="btn btn--ghost{% if is_favourited %} is-active{% endif %}"
+              type="submit"
+              aria-pressed="{% if is_favourited %}true{% else %}false{% endif %}"
+            >
+              {% if is_favourited %}Saved to favourites{% else %}Add to favourites{% endif %}
+            </button>
+          </form>
+        {% else %}
+          <a class="btn btn--ghost" href="/accounts/login/?next={{ request.path }}">Sign in to favourite</a>
+        {% endif %}
+        <a class="btn btn--ghost" href="{% url 'store-product-list' %}?category={{ product.category.slug }}">
+          More from {{ product.category.name }}
+        </a>
+      </div>
+
+      <div class="share-box">
+        <p class="share-box__label">Public item link</p>
+        <div class="share-box__row">
+          <input class="share-box__input" type="text" readonly value="{{ public_url }}" data-share-input>
+          <button
+            class="btn"
+            type="button"
+            data-share-product="{{ product.slug }}"
+            data-share-url="{{ public_url }}"
+            data-share-title="{{ product.name }}"
+          >
+            Share
+          </button>
+        </div>
+        <p class="share-box__status" data-share-status>
+          Copies the public link (or opens your device share sheet). Searchable by ID {{ public_id }}.
+        </p>
+      </div>
+
+      {% if specs %}
+        <table class="specs">
+          <tbody>
+            {% for key, value in specs %}
+              <tr>
+                <th>{{ key }}</th>
+                <td>{{ value }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+
+      {% if product.tags.all %}
+        <ul class="chip-list">
+          {% for tag in product.tags.all %}
+            <li><a href="{% url 'store-product-list' %}?tag={{ tag.slug }}">{{ tag.name }}</a></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </article>
+
+  {% if similar_products %}
+    <section class="similar-section">
+      <div class="section__head">
+        <div>
+          <h2>Similar items</h2>
+          <p class="muted">Matched by tags, brand, and description keywords.</p>
+        </div>
+        <a href="{% url 'store-product-list' %}?category={{ product.category.slug }}">See more →</a>
+      </div>
+      <div class="product-grid">
+        {% for product in similar_products %}
+          {% include "store/partials/product_card.html" %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+</div>
+{% endblock %}

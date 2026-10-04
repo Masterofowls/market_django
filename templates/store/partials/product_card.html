@@ -1,0 +1,53 @@
+{% with image=product.images.all.0 %}
+<article class="product-card">
+  <a class="product-card__link" href="{% url 'store-product-detail' product.slug %}">
+    <div class="product-card__media">
+      {% if image %}
+        <img src="{{ image.card_thumb.url }}" alt="{{ image.alt_text|default:product.name }}" loading="lazy">
+      {% else %}
+        <div class="product-card__placeholder" aria-hidden="true"></div>
+      {% endif %}
+      {% if product.discount_percent %}
+        <span class="product-card__badge">-{{ product.discount_percent|floatformat:0 }}%</span>
+      {% endif %}
+    </div>
+    <div class="product-card__body">
+      <p class="product-card__brand">{{ product.category.name }}</p>
+      <h3 class="product-card__title">{{ product.name }}</h3>
+      <p class="product-card__desc">{{ product.short_description|truncatechars:90 }}</p>
+      <div class="product-card__meta">
+        <div class="product-card__price">
+          {% if product.discount_percent %}
+            <s>{{ product.price }} €</s>
+          {% endif %}
+          <strong>{{ product.final_price }} €</strong>
+        </div>
+        <span class="product-card__rating">★ {{ product.average_rating }}</span>
+      </div>
+    </div>
+  </a>
+  <div class="product-card__actions">
+    <form method="post" action="{% url 'store-cart-add' product.id %}" data-cart-add>
+      {% csrf_token %}
+      <input type="hidden" name="quantity" value="1">
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button class="btn btn--small" type="submit">Add to cart</button>
+    </form>
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'store-favourite-toggle' product.id %}" data-favourite-toggle>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button
+          class="btn btn--ghost btn--small{% if product.id in favourite_ids %} is-active{% endif %}"
+          type="submit"
+          aria-pressed="{% if product.id in favourite_ids %}true{% else %}false{% endif %}"
+        >
+          {% if product.id in favourite_ids %}Saved{% else %}Favourite{% endif %}
+        </button>
+      </form>
+    {% else %}
+      <a class="btn btn--ghost btn--small" href="/accounts/login/?next={% url 'store-product-detail' product.slug %}">Favourite</a>
+    {% endif %}
+  </div>
+</article>
+{% endwith %}

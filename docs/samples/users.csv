@@ -1,0 +1,2 @@
+username,email,first_name,last_name,phone,is_active,is_staff,marketing_opt_in
+demo_buyer,buyer@example.com,Demo,Buyer,+10000000000,1,0,0

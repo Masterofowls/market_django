@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Orders — {{ STORE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="wrap account-page">
+  <div class="section__head">
+    <div>
+      <h1>Orders</h1>
+      <p class="muted">Your purchase history.</p>
+    </div>
+  </div>
+  {% include "account/_nav.html" %}
+
+  {% if orders %}
+    <ul class="plain-list order-list">
+      {% for order in orders %}
+        <li>
+          <a href="{% url 'account-order-detail' order.number %}">
+            <strong>{{ order.number }}</strong>
+            <span>{{ order.created_at|date:"M j, Y" }} · {{ order.status }} · {{ order.grand_total }} €</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="empty-panel">
+      <h2>No orders yet</h2>
+      <a class="btn" href="{% url 'store-product-list' %}">Shop phones</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

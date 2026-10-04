@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Order {{ order.number }} — {{ STORE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="wrap account-page">
+  <div class="section__head">
+    <div>
+      <h1>Order {{ order.number }}</h1>
+      <p class="muted">{{ order.created_at|date:"M j, Y H:i" }} · {{ order.status }}</p>
+    </div>
+    <a class="btn btn--ghost" href="{% url 'account-orders' %}">All orders</a>
+  </div>
+  {% include "account/_nav.html" %}
+
+  <div class="cart-list">
+    {% for item in order.items.all %}
+      <article class="cart-row">
+        <div class="cart-row__body">
+          <h2>{{ item.product_name }}</h2>
+          <p class="muted">SKU {{ item.product_sku }} · Qty {{ item.quantity }}</p>
+        </div>
+        <div class="cart-row__total"><strong>{{ item.line_total }} €</strong></div>
+      </article>
+    {% endfor %}
+  </div>
+  <div class="cart-summary">
+    <p>Subtotal <strong>{{ order.subtotal }} €</strong></p>
+    {% if order.discount_total %}<p>Discount <strong>-{{ order.discount_total }} €</strong></p>{% endif %}
+    <p>Shipping <strong>{{ order.shipping_total }} €</strong></p>
+    <p>Total <strong>{{ order.grand_total }} €</strong></p>
+    {% if order.shipping_address %}
+      <p class="muted">Ship to: {{ order.shipping_address }}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
