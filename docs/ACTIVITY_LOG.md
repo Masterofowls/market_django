@@ -25,3 +25,4 @@
 - Forced Django superuser `admin` / `admin@gmail.com` on Supabase (shared with Fly).
 - Admin-managed header categories via `Category.show_in_header` + `header_order`.
 - Fixed mobile layout: header overflow, sticky cart chip, brand chips, 2-col product grid.
+- Product reviews/ratings UI; admin list-edit price/discount + clear/apply actions; fixed mobile menu click-through.

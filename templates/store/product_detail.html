@@ -19,7 +19,10 @@
       <div class="product-detail__meta-row">
         <span>ID {{ public_id }}</span>
         <span>SKU {{ product.sku }}</span>
-        <span>★ {{ product.average_rating }} ({{ product.rating_count }} reviews)</span>
+        <a href="#reviews" class="rating-chip">
+          ★ {{ product.average_rating }}
+          <span>({{ product.rating_count }} review{{ product.rating_count|pluralize }})</span>
+        </a>
       </div>
       <div class="product-detail__price">
         {% if product.discount_percent %}
@@ -101,6 +104,120 @@
       {% endif %}
     </div>
   </article>
+
+  <section class="reviews-section" id="reviews">
+    <div class="section__head">
+      <div>
+        <h2>Ratings &amp; feedback</h2>
+        <p class="muted">Real customer ratings update the product score automatically.</p>
+      </div>
+    </div>
+
+    <div class="reviews-summary">
+      <div class="reviews-summary__score">
+        <strong>{{ product.average_rating }}</strong>
+        <span>out of 5</span>
+        <p class="muted">{{ product.rating_count }} review{{ product.rating_count|pluralize }}</p>
+      </div>
+      <div class="reviews-summary__bars">
+        {% for row in rating_breakdown %}
+          <div class="rating-bar">
+            <span>{{ row.stars }}★</span>
+            <div class="rating-bar__track"><i style="width: {{ row.percent }}%"></i></div>
+            <span>{{ row.count }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="reviews-grid">
+      <div class="review-form-panel">
+        <h3>{% if user_review %}Update your review{% else %}Write a review{% endif %}</h3>
+        {% if user.is_authenticated %}
+          <form class="panel-form" method="post" action="{% url 'store-product-review' product.slug %}">
+            {% csrf_token %}
+            <fieldset class="star-rating">
+              <legend>Your rating</legend>
+              <div class="star-rating__options">
+                {% for value, label in review_form.fields.rating.choices %}
+                  <label>
+                    <input
+                      type="radio"
+                      name="rating"
+                      value="{{ value }}"
+                      {% if review_form.rating.value|stringformat:"s" == value|stringformat:"s" %}checked{% elif not review_form.rating.value and value == 5 %}checked{% endif %}
+                      required
+                    >
+                    <span>{{ value }}★</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </fieldset>
+            <label>
+              {{ review_form.title.label }}
+              {{ review_form.title }}
+            </label>
+            <label>
+              {{ review_form.body.label }}
+              {{ review_form.body }}
+            </label>
+            <button class="btn" type="submit">
+              {% if user_review %}Save changes{% else %}Submit review{% endif %}
+            </button>
+          </form>
+        {% else %}
+          <p class="muted">
+            <a href="/accounts/login/?next={{ request.path }}%23reviews">Sign in</a>
+            to rate this phone and leave feedback.
+          </p>
+        {% endif %}
+
+        <h3 class="review-form-panel__sub">Leave a comment</h3>
+        {% if user.is_authenticated %}
+          <form class="panel-form" method="post" action="{% url 'store-product-comment' product.slug %}">
+            {% csrf_token %}
+            <label>
+              {{ comment_form.body.label }}
+              {{ comment_form.body }}
+            </label>
+            <button class="btn btn--ghost" type="submit">Post comment</button>
+          </form>
+        {% else %}
+          <p class="muted">Sign in to comment.</p>
+        {% endif %}
+      </div>
+
+      <div class="review-list">
+        <h3>Customer reviews</h3>
+        {% for review in reviews %}
+          <article class="review-card">
+            <div class="review-card__head">
+              <strong>{{ review.user.get_username }}</strong>
+              <span class="review-card__stars">{% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</span>
+            </div>
+            {% if review.title %}<h4>{{ review.title }}</h4>{% endif %}
+            {% if review.body %}<p>{{ review.body }}</p>{% endif %}
+            <p class="muted">{{ review.created_at|date:"M j, Y" }}</p>
+          </article>
+        {% empty %}
+          <p class="muted">No reviews yet — be the first to rate this phone.</p>
+        {% endfor %}
+
+        {% if comments %}
+          <h3>Comments</h3>
+          {% for comment in comments %}
+            <article class="review-card review-card--comment">
+              <div class="review-card__head">
+                <strong>{{ comment.user.get_username }}</strong>
+                <span class="muted">{{ comment.created_at|date:"M j, Y" }}</span>
+              </div>
+              <p>{{ comment.body }}</p>
+            </article>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </section>
 
   {% if similar_products %}
     <section class="similar-section">

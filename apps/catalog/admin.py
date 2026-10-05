@@ -138,12 +138,53 @@ class ProductAdmin(ImportExportModelAdmin):
         "is_featured",
         "average_rating",
     )
+    list_editable = ("price", "discount_percent", "stock", "is_active", "is_featured")
     list_filter = ("is_active", "is_featured", "category", "tags")
     search_fields = ("name", "sku", "slug", "description", "tags__name")
     prepopulated_fields = {"slug": ("name",)}
     filter_horizontal = ("tags",)
     inlines = [ProductImageInline]
     autocomplete_fields = ("category",)
+    actions = ("clear_discounts", "apply_10_percent_discount", "apply_20_percent_discount")
+    fieldsets = (
+        (None, {"fields": ("name", "slug", "sku", "category", "tags")}),
+        ("Copy", {"fields": ("short_description", "description")}),
+        (
+            "Pricing & stock",
+            {
+                "fields": ("price", "discount_percent", "stock"),
+                "description": (
+                    "Set list price and optional discount %. "
+                    "Set discount to 0 to remove a sale. "
+                    "Final price = price − discount%."
+                ),
+            },
+        ),
+        ("Visibility", {"fields": ("is_active", "is_featured")}),
+        (
+            "Ratings (auto)",
+            {
+                "fields": ("average_rating", "rating_count", "share_count"),
+                "classes": ("collapse",),
+            },
+        ),
+    )
+    readonly_fields = ("average_rating", "rating_count", "share_count")
+
+    @admin.action(description="Remove discount (set to 0%)")
+    def clear_discounts(self, request, queryset):  # noqa: ANN001
+        updated = queryset.update(discount_percent=0)
+        self.message_user(request, f"Cleared discount on {updated} product(s).")
+
+    @admin.action(description="Apply 10% discount")
+    def apply_10_percent_discount(self, request, queryset):  # noqa: ANN001
+        updated = queryset.update(discount_percent=10)
+        self.message_user(request, f"Set 10% discount on {updated} product(s).")
+
+    @admin.action(description="Apply 20% discount")
+    def apply_20_percent_discount(self, request, queryset):  # noqa: ANN001
+        updated = queryset.update(discount_percent=20)
+        self.message_user(request, f"Set 20% discount on {updated} product(s).")
 
 
 @admin.register(CatalogSection)

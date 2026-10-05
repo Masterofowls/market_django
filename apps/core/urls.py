@@ -1,6 +1,7 @@
 from django.urls import include, path
 
 from apps.core import commerce_views, views
+from apps.reviews import storefront as review_views
 
 urlpatterns = [
     path("", views.HomeView.as_view(), name="store-home"),
@@ -15,6 +16,16 @@ urlpatterns = [
         "products/<slug:slug>/share/",
         views.product_share,
         name="store-product-share",
+    ),
+    path(
+        "products/<slug:slug>/review/",
+        review_views.product_review,
+        name="store-product-review",
+    ),
+    path(
+        "products/<slug:slug>/comment/",
+        review_views.product_comment,
+        name="store-product-comment",
     ),
     path("categories/", views.category_list, name="store-category-list"),
     path("categories/<slug:slug>/", views.category_detail, name="store-category-detail"),

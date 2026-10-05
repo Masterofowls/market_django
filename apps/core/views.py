@@ -15,6 +15,8 @@ from apps.catalog.history import record_product_view
 from apps.catalog.models import Category, Product, ProductShare
 from apps.marketing.models import Banner, Slider
 from apps.recommendations.services import recommend_for_product
+from apps.reviews.forms import CommentForm, ReviewForm
+from apps.reviews.models import Comment, Review
 
 
 def _parse_specs(description: str) -> list[tuple[str, str]]:
@@ -113,11 +115,15 @@ class ProductDetailView(DetailView):
     slug_url_kwarg = "slug"
 
     def get_queryset(self):
-        return Product.objects.filter(is_active=True).prefetch_related(
-            "images",
-            "tags",
-            "reviews",
-            "comments",
+        return (
+            Product.objects.filter(is_active=True)
+            .select_related("category")
+            .prefetch_related(
+                "images",
+                "tags",
+                "reviews__user",
+                "comments__user",
+            )
         )
 
     def get(self, request, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003
@@ -129,6 +135,18 @@ class ProductDetailView(DetailView):
         ctx = super().get_context_data(**kwargs)
         product = self.object
         public_path = reverse("store-product-detail", kwargs={"slug": product.slug})
+        reviews = [
+            r for r in product.reviews.all() if r.is_approved
+        ]
+        comments = [
+            c for c in product.comments.all() if c.is_approved and c.parent_id is None
+        ]
+        user_review = None
+        if self.request.user.is_authenticated:
+            user_review = next(
+                (r for r in reviews if r.user_id == self.request.user.id),
+                None,
+            )
         ctx["specs"] = _parse_specs(product.description)
         ctx["public_id"] = product.pk
         ctx["public_url"] = self.request.build_absolute_uri(public_path)
@@ -138,7 +156,28 @@ class ProductDetailView(DetailView):
             if self.request.user.is_authenticated
             else False
         )
+        ctx["reviews"] = reviews
+        ctx["comments"] = comments
+        ctx["user_review"] = user_review
+        ctx["review_form"] = ReviewForm(instance=user_review)
+        ctx["comment_form"] = CommentForm()
+        ctx["rating_breakdown"] = _rating_breakdown(reviews)
         return ctx
+
+
+def _rating_breakdown(reviews: list) -> list[dict]:
+    counts = {star: 0 for star in range(1, 6)}
+    for review in reviews:
+        counts[review.rating] = counts.get(review.rating, 0) + 1
+    total = len(reviews) or 1
+    return [
+        {
+            "stars": star,
+            "count": counts[star],
+            "percent": round((counts[star] / total) * 100),
+        }
+        for star in range(5, 0, -1)
+    ]
 
 
 def request_user_has_favourite(request, product_id: int) -> bool:  # noqa: ANN001
